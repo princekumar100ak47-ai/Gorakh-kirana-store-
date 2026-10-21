@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gorakh Kirana Store</title>
+  <style>
+    body { margin:0; font-family:Arial,sans-serif; background:#f5f7f2; color:#222; }
+    header { background:#176b3a; color:white; padding:22px 16px; text-align:center; }
+    header h1 { margin:0 0 8px; }
+    .search { display:block; width:90%; max-width:500px; padding:12px; margin:16px auto; border:1px solid #ccc; border-radius:8px; box-sizing:border-box; }
+    h2 { margin:16px; }
+    #products { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; padding:12px; }
+    .item { background:white; padding:14px; border-radius:12px; box-shadow:0 2px 7px #ddd; }
+    .item h3 { margin:6px 0; font-size:17px; }
+    button { background:#176b3a; color:white; border:0; padding:10px; border-radius:7px; cursor:pointer; }
+    .cart { background:white; padding:16px; margin:12px; border-radius:12px; }
+    .order { display:block; width:100%; margin-top:12px; }
+    footer { text-align:center; padding:20px; color:#555; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Gorakh Kirana Store</h1>
+    <p>Fresh groceries for your family</p>
+    <p>Open daily: 6 AM – 9 PM</p>
+  </header>
+
+  <input class="search" id="search" placeholder="Search groceries..."
+         oninput="showProducts()">
+
+  <h2>Our Products</h2>
+  <div id="products"></div>
+
+  <section class="cart">
+    <h2>Your Cart: <span id="count">0</span> items</h2>
+    <div id="cartItems">Your cart is empty.</div>
+    <h3>Total: ₹<span id="total">0</span></h3>
+    <p>Delivery: 0–2 km free; above 2–5 km ₹20.</p>
+    <p>Payment: Cash on Delivery or UPI (subject to setup).</p>
+    <button class="order" onclick="checkout()">Place Order</button>
+    <p id="message"></p>
+  </section>
+
+  <footer>
+    Contact: 7366887675<br>
+    Gorakh Kirana Store
+  </footer>
+
+  <script>
+    const products = [
+      {id:1,name:"Rice (1 kg)",price:60},
+      {id:2,name:"Wheat Flour (1 kg)",price:40},
+      {id:3,name:"Sugar (1 kg)",price:45},
+      {id:4,name:"Cooking Oil (1 L)",price:140},
+      {id:5,name:"Salt (1 kg)",price:20},
+      {id:6,name:"Tea (250 g)",price:100}
+    ];
+
+    const cart = {};
+
+    function showProducts() {
+      const q = document.getElementById("search").value.toLowerCase();
+      document.getElementById("products").innerHTML = products
+        .filter(p => p.name.toLowerCase().includes(q))
+        .map(p => `<article class="item">
+          <h3>${p.name}</h3>
+          <p>₹${p.price}</p>
+          <button onclick="add(${p.id})">Add to Cart</button>
+        </article>`).join("");
+    }
+
+    function add(id) {
+      cart[id] = (cart[id] || 0) + 1;
+      showCart();
+    }
+
+    function showCart() {
+      let count = 0, total = 0;
+      const lines = products.filter(p => cart[p.id]).map(p => {
+        count += cart[p.id];
+        total += p.price * cart[p.id];
+        return `<p>${p.name} × ${cart[p.id]}
+          <button onclick="change(${p.id},-1)">−</button>
+          <button onclick="change(${p.id},1)">+</button>
+          — ₹${p.price * cart[p.id]}</p>`;
+      });
+      document.getElementById("count").textContent = count;
+      document.getElementById("total").textContent = total;
+      document.getElementById("cartItems").innerHTML =
+        lines.join("") || "Your cart is empty.";
+    }
+
+    function change(id, delta) {
+      cart[id] = (cart[id] || 0) + delta;
+      if (cart[id] <= 0) delete cart[id];
+      showCart();
+    }
+
+    function checkout() {
+      if (!Object.keys(cart).length) {
+        document.getElementById("message").textContent =
+          "Please add products to your cart first.";
+        return;
+      }
+      document.getElementById("message").textContent =
+        "Demo only: online ordering is not connected yet. Please call 7366887675 to order.";
+    }
+
+    showProducts();
+  </script>
+</body>
+</html>
